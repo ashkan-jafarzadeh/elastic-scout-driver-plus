@@ -1,78 +1,108 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\Builders;
+namespace ElasticScoutDriverPlus\Builders;
 
 use Closure;
-use Elastic\Adapter\Search\SearchParameters;
-use Elastic\ScoutDriverPlus\Decorators\SearchResult;
-use Elastic\ScoutDriverPlus\Engine;
-use Elastic\ScoutDriverPlus\Exceptions\ModelNotJoinedException;
-use Elastic\ScoutDriverPlus\Exceptions\NotSearchableModelException;
-use Elastic\ScoutDriverPlus\Factories\ModelFactory;
-use Elastic\ScoutDriverPlus\Factories\ParameterFactory;
-use Elastic\ScoutDriverPlus\Paginator;
-use Elastic\ScoutDriverPlus\Searchable;
-use Elastic\ScoutDriverPlus\Support\Arr;
-use Elastic\ScoutDriverPlus\Support\Conditionable;
+use ElasticAdapter\Search\SearchRequest;
+use ElasticScoutDriverPlus\Decorators\SearchResult;
+use ElasticScoutDriverPlus\Engine;
+use ElasticScoutDriverPlus\Exceptions\ModelClassNotFoundInScopeException;
+use ElasticScoutDriverPlus\Factories\LazyModelFactory;
+use ElasticScoutDriverPlus\Factories\ParameterFactory;
+use ElasticScoutDriverPlus\Paginator;
+use ElasticScoutDriverPlus\Support\ModelScope;
 use Illuminate\Database\Eloquent\Model;
 use stdClass;
 
-class SearchParametersBuilder
+class SearchRequestBuilder
 {
-    use Conditionable;
-
     public const DEFAULT_PAGE_SIZE = 10;
 
-    private Engine $engine;
     /**
-     * @var array<string, DatabaseQueryBuilder>
+     * @var array|null
      */
-    private array $databaseQueryBuilders;
+    private $query;
     /**
-     * @var array<string, string>
+     * @var ModelScope
      */
-    private array $indexNames;
-    private ?array $query;
-    private array $highlight = [];
-    private array $sort = [];
-    private array $rescore = [];
-    private ?int $from;
-    private ?int $size;
-    private array $suggest = [];
+    private $modelScope;
+    /**
+     * @var Engine
+     */
+    private $engine;
+    /**
+     * @var array
+     */
+    private $highlight = [];
+    /**
+     * @var array
+     */
+    private $sort = [];
+    /**
+     * @var array
+     */
+    private $rescore = [];
+    /**
+     * @var int|null
+     */
+    private $from;
+    /**
+     * @var int|null
+     */
+    private $size;
+    /**
+     * @var array
+     */
+    private $suggest = [];
     /**
      * @var bool|string|array|null
      */
     private $source;
-    private array $collapse = [];
-    private array $aggregations = [];
-    private array $postFilter = [];
+    /**
+     * @var array
+     */
+    private $collapse = [];
+    /**
+     * @var array
+     */
+    private $aggregations = [];
+    /**
+     * @var array
+     */
+    private $postFilter = [];
     /**
      * @var int|bool|null
      */
     private $trackTotalHits;
-    private ?bool $trackScores;
-    private ?float $minScore;
-    private array $indicesBoost = [];
-    private ?string $searchType;
-    private ?string $preference;
-    private ?array $pointInTime;
-    private ?array $searchAfter;
-    private ?array $routing;
-    private ?bool $explain;
-
-    public function __construct(Model $model)
-    {
-        $this->engine = $model->searchableUsing();
-        $this->join(get_class($model));
-    }
+    /**
+     * @var bool|null
+     */
+    private $trackScores;
+    /**
+     * @var float|null
+     */
+    private $minScore;
+    /**
+     * @var array
+     */
+    private $indicesBoost = [];
+    /**
+     * @var string|null
+     */
+    private $searchType;
+    /**
+     * @var string|null
+     */
+    private $preference;
 
     /**
      * @param Closure|QueryBuilderInterface|array|null $query
      */
-    public function query($query): self
+    public function __construct($query, Model $model)
     {
         $this->query = isset($query) ? ParameterFactory::makeQuery($query) : null;
-        return $this;
+        $this->modelScope = new ModelScope(get_class($model));
+        $this->engine = $model->searchableUsing();
     }
 
     public function highlightRaw(array $highlight): self
@@ -120,7 +150,7 @@ class SearchParametersBuilder
 
     public function rescoreWindowSize(int $windowSize): self
     {
-        $this->rescore['window_size'] = $windowSize;
+        $this->rescore['window_size'] =  $windowSize;
         return $this;
     }
 
@@ -194,27 +224,9 @@ class SearchParametersBuilder
         return $this;
     }
 
-    public function join(string $modelClass, float $boost = null): self
+    public function join(string ...$modelClasses): self
     {
-        if (
-            !is_a($modelClass, Model::class, true) ||
-            !in_array(Searchable::class, class_uses_recursive($modelClass), true)
-        ) {
-            throw new NotSearchableModelException($modelClass);
-        }
-
-        /** @var Model $model */
-        $model = new $modelClass();
-        /** @var string $indexName */
-        $indexName = $model->searchableAs();
-
-        $this->indexNames[$modelClass] = $indexName;
-        $this->databaseQueryBuilders[$indexName] = new DatabaseQueryBuilder($model);
-
-        if (isset($boost)) {
-            $this->indicesBoost[] = [$indexName => $boost];
-        }
-
+        $this->modelScope->push(...$modelClasses);
         return $this;
     }
 
@@ -229,17 +241,13 @@ class SearchParametersBuilder
 
     public function load(array $relations, string $modelClass = null): self
     {
-        $indexName = $this->resolveJoinedIndexName($modelClass);
-        $this->databaseQueryBuilders[$indexName]->with($relations);
-
+        $this->modelScope->with($relations, $modelClass);
         return $this;
     }
 
-    public function refineModels(Closure $callback, string $modelClass = null): self
+    public function refineModels(callable $callback, string $modelClass = null): self
     {
-        $indexName = $this->resolveJoinedIndexName($modelClass);
-        $this->databaseQueryBuilders[$indexName]->callback($callback);
-
+        $this->modelScope->modifyQuery($callback, $modelClass);
         return $this;
     }
 
@@ -264,6 +272,18 @@ class SearchParametersBuilder
         return $this;
     }
 
+    public function boostIndex(string $modelClass, float $boost): self
+    {
+        if (!$this->modelScope->contains($modelClass)) {
+            throw new ModelClassNotFoundInScopeException($modelClass);
+        }
+
+        $indexName = $this->modelScope->resolveIndexName($modelClass);
+        $this->indicesBoost[] = [$indexName => $boost];
+
+        return $this;
+    }
+
     public function searchType(string $searchType): self
     {
         $this->searchType = $searchType;
@@ -276,133 +296,103 @@ class SearchParametersBuilder
         return $this;
     }
 
-    public function pointInTime(string $pointInTimeId, ?string $keepAlive = null): self
+    /**
+     * @param mixed         $value
+     * @param callable      $callback
+     * @param callable|null $default
+     *
+     * @return mixed
+     */
+    public function when($value, $callback, $default = null)
     {
-        $this->pointInTime = ['id' => $pointInTimeId];
+        if ($value) {
+            return $callback($this, $value) ?? $this;
+        }
 
-        if (isset($keepAlive)) {
-            $this->pointInTime['keep_alive'] = $keepAlive;
+        if ($default) {
+            return $default($this, $value) ?? $this;
         }
 
         return $this;
     }
 
-    public function searchAfter(array $searchAfter): self
+    public function buildSearchRequest(): SearchRequest
     {
-        $this->searchAfter = $searchAfter;
-        return $this;
-    }
-
-    public function routing(array $routing): self
-    {
-        $this->routing = $routing;
-        return $this;
-    }
-
-    public function explain(bool $explain): self
-    {
-        $this->explain = $explain;
-        return $this;
-    }
-
-    public function buildSearchParameters(): SearchParameters
-    {
-        $searchParameters = new SearchParameters();
-
-        if (isset($this->pointInTime)) {
-            $searchParameters->pointInTime($this->pointInTime);
-        } else {
-            $searchParameters->indices($this->indexNames);
-
-            if (isset($this->preference)) {
-                $searchParameters->preference($this->preference);
-            }
-
-            if (isset($this->routing)) {
-                $searchParameters->routing($this->routing);
-            }
-        }
-
-        if (isset($this->query)) {
-            $searchParameters->query($this->query);
-        }
+        $searchRequest = new SearchRequest($this->query);
 
         if (!empty($this->highlight)) {
-            $searchParameters->highlight($this->highlight);
+            $searchRequest->highlight($this->highlight);
         }
 
         if (!empty($this->sort)) {
-            $searchParameters->sort($this->sort);
+            $searchRequest->sort($this->sort);
         }
 
         if (!empty($this->rescore)) {
-            $searchParameters->rescore($this->rescore);
+            $searchRequest->rescore($this->rescore);
         }
 
         if (isset($this->from)) {
-            $searchParameters->from($this->from);
+            $searchRequest->from($this->from);
         }
 
         if (isset($this->size)) {
-            $searchParameters->size($this->size);
+            $searchRequest->size($this->size);
         }
 
         if (!empty($this->suggest)) {
-            $searchParameters->suggest($this->suggest);
+            $searchRequest->suggest($this->suggest);
         }
 
         if (isset($this->source)) {
-            $searchParameters->source($this->source);
+            $searchRequest->source($this->source);
         }
 
         if (!empty($this->collapse)) {
-            $searchParameters->collapse($this->collapse);
+            $searchRequest->collapse($this->collapse);
         }
 
         if (!empty($this->aggregations)) {
-            $searchParameters->aggregations($this->aggregations);
+            $searchRequest->aggregations($this->aggregations);
         }
 
         if (!empty($this->postFilter)) {
-            $searchParameters->postFilter($this->postFilter);
+            $searchRequest->postFilter($this->postFilter);
         }
 
         if (isset($this->trackTotalHits)) {
-            $searchParameters->trackTotalHits($this->trackTotalHits);
+            $searchRequest->trackTotalHits($this->trackTotalHits);
         }
 
         if (isset($this->trackScores)) {
-            $searchParameters->trackScores($this->trackScores);
+            $searchRequest->trackScores($this->trackScores);
         }
 
         if (isset($this->minScore)) {
-            $searchParameters->minScore($this->minScore);
+            $searchRequest->minScore($this->minScore);
         }
 
         if (!empty($this->indicesBoost)) {
-            $searchParameters->indicesBoost($this->indicesBoost);
+            $searchRequest->indicesBoost($this->indicesBoost);
         }
 
         if (isset($this->searchType)) {
-            $searchParameters->searchType($this->searchType);
+            $searchRequest->searchType($this->searchType);
         }
 
-        if (isset($this->searchAfter)) {
-            $searchParameters->searchAfter($this->searchAfter);
+        if (isset($this->preference)) {
+            $searchRequest->preference($this->preference);
         }
 
-        if (isset($this->explain)) {
-            $searchParameters->explain($this->explain);
-        }
-
-        return $searchParameters;
+        return $searchRequest;
     }
 
     public function execute(): SearchResult
     {
-        $baseSearchResult = $this->engine->searchWithParameters($this->buildSearchParameters());
-        $modelFactory = new ModelFactory($this->databaseQueryBuilders);
-        return new SearchResult($baseSearchResult, $modelFactory);
+        $searchResponse = $this->engine->executeSearchRequest($this->buildSearchRequest(), $this->modelScope);
+        $lazyModelFactory = new LazyModelFactory($searchResponse, $this->modelScope);
+
+        return new SearchResult($searchResponse, $lazyModelFactory);
     }
 
     public function paginate(
@@ -431,20 +421,7 @@ class SearchParametersBuilder
     public function raw(): array
     {
         return $this->engine
-            ->searchWithParameters($this->buildSearchParameters())
+            ->executeSearchRequest($this->buildSearchRequest(), $this->modelScope)
             ->raw();
-    }
-
-    private function resolveJoinedIndexName(?string $modelClass): string
-    {
-        if (isset($modelClass)) {
-            if (isset($this->indexNames[$modelClass])) {
-                return $this->indexNames[$modelClass];
-            }
-
-            throw new ModelNotJoinedException($modelClass);
-        }
-
-        return Arr::first($this->indexNames);
     }
 }

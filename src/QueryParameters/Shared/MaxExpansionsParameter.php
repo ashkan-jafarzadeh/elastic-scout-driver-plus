@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\QueryParameters\Shared;
+namespace ElasticScoutDriverPlus\QueryParameters\Shared;
 
 trait MaxExpansionsParameter
 {

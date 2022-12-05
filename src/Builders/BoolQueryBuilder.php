@@ -1,21 +1,27 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\Builders;
+namespace ElasticScoutDriverPlus\Builders;
 
 use Closure;
-use Elastic\ScoutDriverPlus\Factories\ParameterFactory;
-use Elastic\ScoutDriverPlus\QueryParameters\ParameterCollection;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\MinimumShouldMatchParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Transformers\FlatArrayTransformer;
-use Elastic\ScoutDriverPlus\QueryParameters\Validators\OneOfValidator;
-use Elastic\ScoutDriverPlus\Support\Arr;
+use ElasticScoutDriverPlus\Factories\ParameterFactory;
+use ElasticScoutDriverPlus\QueryParameters\ParameterCollection;
+use ElasticScoutDriverPlus\QueryParameters\Shared\MinimumShouldMatchParameter;
+use ElasticScoutDriverPlus\QueryParameters\Transformers\FlatArrayTransformer;
+use ElasticScoutDriverPlus\QueryParameters\Validators\OneOfValidator;
+use ElasticScoutDriverPlus\Support\Arr;
 
 final class BoolQueryBuilder extends AbstractParameterizedQueryBuilder
 {
     use MinimumShouldMatchParameter;
 
-    protected string $type = 'bool';
-    private ?int $softDeleted = 0;
+    /**
+     * @var string
+     */
+    protected $type = 'bool';
+    /**
+     * @var int|null
+     */
+    private $softDeleted = 0;
 
     public function __construct()
     {

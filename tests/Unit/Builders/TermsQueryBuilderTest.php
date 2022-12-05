@@ -1,21 +1,24 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\Tests\Unit\Builders;
+namespace ElasticScoutDriverPlus\Tests\Unit\Builders;
 
-use Elastic\ScoutDriverPlus\Builders\TermsQueryBuilder;
+use ElasticScoutDriverPlus\Builders\TermsQueryBuilder;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Elastic\ScoutDriverPlus\Builders\AbstractParameterizedQueryBuilder
- * @covers \Elastic\ScoutDriverPlus\Builders\TermsQueryBuilder
+ * @covers \ElasticScoutDriverPlus\Builders\AbstractParameterizedQueryBuilder
+ * @covers \ElasticScoutDriverPlus\Builders\TermsQueryBuilder
  *
- * @uses   \Elastic\ScoutDriverPlus\QueryParameters\ParameterCollection
- * @uses   \Elastic\ScoutDriverPlus\QueryParameters\Transformers\CallbackArrayTransformer
- * @uses   \Elastic\ScoutDriverPlus\QueryParameters\Validators\AllOfValidator
+ * @uses   \ElasticScoutDriverPlus\QueryParameters\ParameterCollection
+ * @uses   \ElasticScoutDriverPlus\QueryParameters\Transformers\CallbackArrayTransformer
+ * @uses   \ElasticScoutDriverPlus\QueryParameters\Validators\AllOfValidator
  */
 final class TermsQueryBuilderTest extends TestCase
 {
-    private TermsQueryBuilder $builder;
+    /**
+     * @var TermsQueryBuilder
+     */
+    private $builder;
 
     protected function setUp(): void
     {

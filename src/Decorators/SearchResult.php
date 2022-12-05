@@ -1,22 +1,18 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\Decorators;
+namespace ElasticScoutDriverPlus\Decorators;
 
 use ArrayIterator;
-use Elastic\Adapter\Search\Hit as BaseHit;
-use Elastic\Adapter\Search\SearchResult as BaseSearchResult;
-use Elastic\Adapter\Search\Suggestion as BaseSuggestion;
-use Elastic\ScoutDriverPlus\Factories\LazyModelFactory;
-use Elastic\ScoutDriverPlus\Factories\ModelFactory;
+use ElasticAdapter\Search\Hit as BaseHit;
+use ElasticAdapter\Search\SearchResponse;
+use ElasticScoutDriverPlus\Factories\LazyModelFactory;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\Traits\ForwardsCalls;
 use IteratorAggregate;
-use Traversable;
 
 /**
- * @mixin BaseSearchResult
+ * @mixin SearchResponse
  * @mixin BaseCollection
  *
  * @implements IteratorAggregate<int, Hit>
@@ -25,69 +21,77 @@ final class SearchResult implements IteratorAggregate
 {
     use ForwardsCalls;
 
-    private BaseSearchResult $baseSearchResult;
-    private ModelFactory $modelFactory;
-    private LazyModelFactory $lazyModelFactory;
+    /**
+     * @var SearchResponse
+     */
+    private $searchResponse;
+    /**
+     * @var LazyModelFactory
+     */
+    private $lazyModelFactory;
 
-    public function __construct(BaseSearchResult $baseSearchResult, ModelFactory $modelFactory)
+    public function __construct(SearchResponse $searchResponse, LazyModelFactory $lazyModelFactory)
     {
-        $this->baseSearchResult = $baseSearchResult;
-        $this->modelFactory = $modelFactory;
-        $this->lazyModelFactory = new LazyModelFactory($baseSearchResult, $modelFactory);
+        $this->searchResponse = $searchResponse;
+        $this->lazyModelFactory = $lazyModelFactory;
     }
 
     public function hits(): BaseCollection
     {
-        return $this->baseSearchResult->hits()->map(
-            fn (BaseHit $baseHit) => new Hit($baseHit, $this->lazyModelFactory)
-        );
+        return $this->searchResponse->hits()->map(function (BaseHit $hit) {
+            return new Hit($hit, $this->lazyModelFactory);
+        });
     }
 
     public function models(): EloquentCollection
     {
-        $models = $this->hits()->map(
-            static fn (Hit $hit) => $hit->model()
-        )->filter()->values();
+        $models = $this->hits()->map(static function (Hit $hit) {
+            return $hit->model();
+        })->filter()->values();
 
         return new EloquentCollection($models);
     }
 
-    public function suggestions(): BaseCollection
-    {
-        return $this->baseSearchResult->suggestions()->map(
-            fn (Collection $baseSuggestions) => $baseSuggestions->map(
-                fn (BaseSuggestion $baseSuggestion) => new Suggestion($baseSuggestion, $this->modelFactory)
-            )
-        );
-    }
-
     public function documents(): BaseCollection
     {
-        return $this->hits()->map(
-            static fn (Hit $hit) => $hit->document()
-        );
+        return $this->hits()->map(static function (Hit $hit) {
+            return $hit->document();
+        })->filter()->values();
     }
 
     public function highlights(): BaseCollection
     {
-        return $this->hits()->map(
-            static fn (Hit $hit) => $hit->highlight()
-        )->filter()->values();
+        return $this->hits()->map(static function (Hit $hit) {
+            return $hit->highlight();
+        })->filter()->values();
     }
 
     /**
-     * @return ArrayIterator|Traversable
+     * @return ArrayIterator<int, Hit>
      */
-    public function getIterator(): Traversable
+    public function getIterator()
     {
         return $this->hits()->getIterator();
     }
+
+
+
+    /**
+     * get mapped ids
+     *
+     * @return array
+     */
+    public function getMappedIds()
+    {
+        return $this->lazyModelFactory->getMappedIds();
+    }
+
 
     /**
      * @return mixed
      */
     public function __call(string $method, array $parameters)
     {
-        return $this->forwardCallTo($this->baseSearchResult, $method, $parameters);
+        return $this->forwardCallTo($this->searchResponse, $method, $parameters);
     }
 }

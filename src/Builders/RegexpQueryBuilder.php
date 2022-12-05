@@ -1,16 +1,15 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\Builders;
+namespace ElasticScoutDriverPlus\Builders;
 
-use Elastic\ScoutDriverPlus\QueryParameters\ParameterCollection;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\CaseInsensitiveParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\FieldParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\FlagsParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\MaxDeterminizedStatesParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\RewriteParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\ValueParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Transformers\GroupedArrayTransformer;
-use Elastic\ScoutDriverPlus\QueryParameters\Validators\AllOfValidator;
+use ElasticScoutDriverPlus\QueryParameters\ParameterCollection;
+use ElasticScoutDriverPlus\QueryParameters\Shared\FieldParameter;
+use ElasticScoutDriverPlus\QueryParameters\Shared\FlagsParameter;
+use ElasticScoutDriverPlus\QueryParameters\Shared\MaxDeterminizedStatesParameter;
+use ElasticScoutDriverPlus\QueryParameters\Shared\RewriteParameter;
+use ElasticScoutDriverPlus\QueryParameters\Shared\ValueParameter;
+use ElasticScoutDriverPlus\QueryParameters\Transformers\GroupedArrayTransformer;
+use ElasticScoutDriverPlus\QueryParameters\Validators\AllOfValidator;
 
 final class RegexpQueryBuilder extends AbstractParameterizedQueryBuilder
 {
@@ -19,9 +18,11 @@ final class RegexpQueryBuilder extends AbstractParameterizedQueryBuilder
     use FlagsParameter;
     use MaxDeterminizedStatesParameter;
     use RewriteParameter;
-    use CaseInsensitiveParameter;
 
-    protected string $type = 'regexp';
+    /**
+     * @var string
+     */
+    protected $type = 'regexp';
 
     public function __construct()
     {

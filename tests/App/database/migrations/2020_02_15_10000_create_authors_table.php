@@ -6,7 +6,10 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateAuthorsTable extends Migration
 {
-    public function up(): void
+    /**
+     * @return void
+     */
+    public function up()
     {
         Schema::create('authors', static function (Blueprint $table) {
             $table->bigIncrements('id');
@@ -17,7 +20,10 @@ class CreateAuthorsTable extends Migration
         });
     }
 
-    public function down(): void
+    /**
+     * @return void
+     */
+    public function down()
     {
         Schema::dropIfExists('authors');
     }

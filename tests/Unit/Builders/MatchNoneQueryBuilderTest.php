@@ -1,17 +1,20 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\Tests\Unit\Builders;
+namespace ElasticScoutDriverPlus\Tests\Unit\Builders;
 
-use Elastic\ScoutDriverPlus\Builders\MatchNoneQueryBuilder;
+use ElasticScoutDriverPlus\Builders\MatchNoneQueryBuilder;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
 /**
- * @covers \Elastic\ScoutDriverPlus\Builders\MatchNoneQueryBuilder
+ * @covers \ElasticScoutDriverPlus\Builders\MatchNoneQueryBuilder
  */
 final class MatchNoneQueryBuilderTest extends TestCase
 {
-    private MatchNoneQueryBuilder $builder;
+    /**
+     * @var MatchNoneQueryBuilder
+     */
+    private $builder;
 
     protected function setUp(): void
     {

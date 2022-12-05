@@ -1,17 +1,20 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\Builders;
+namespace ElasticScoutDriverPlus\Builders;
 
-use Elastic\ScoutDriverPlus\QueryParameters\ParameterCollection;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\ValuesParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Transformers\FlatArrayTransformer;
-use Elastic\ScoutDriverPlus\QueryParameters\Validators\AllOfValidator;
+use ElasticScoutDriverPlus\QueryParameters\ParameterCollection;
+use ElasticScoutDriverPlus\QueryParameters\Shared\ValuesParameter;
+use ElasticScoutDriverPlus\QueryParameters\Transformers\FlatArrayTransformer;
+use ElasticScoutDriverPlus\QueryParameters\Validators\AllOfValidator;
 
 final class IdsQueryBuilder extends AbstractParameterizedQueryBuilder
 {
     use ValuesParameter;
 
-    protected string $type = 'ids';
+    /**
+     * @var string
+     */
+    protected $type = 'ids';
 
     public function __construct()
     {

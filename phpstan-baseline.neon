@@ -1,36 +1,42 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Method Elastic\\\\ScoutDriverPlus\\\\Builders\\\\SearchParametersBuilder\\:\\:resolveJoinedIndexName\\(\\) should return string but returns mixed\\.$#"
+			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:searchableUsing\\(\\)\\.$#"
 			count: 1
-			path: src/Builders/SearchParametersBuilder.php
+			path: src/Builders/SearchRequestBuilder.php
 
 		-
-			message: "#^Parameter \\#1 \\$items of class Illuminate\\\\Database\\\\Eloquent\\\\Collection constructor expects Illuminate\\\\Contracts\\\\Support\\\\Arrayable\\<int, TModel of Illuminate\\\\Database\\\\Eloquent\\\\Model\\>\\|iterable\\<int, TModel of Illuminate\\\\Database\\\\Eloquent\\\\Model\\>\\|null, Illuminate\\\\Support\\\\Collection\\<int, Illuminate\\\\Database\\\\Eloquent\\\\Model\\|null\\> given\\.$#"
+			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:getScoutKey\\(\\)\\.$#"
 			count: 1
-			path: src/Decorators/SearchResult.php
-
-		-
-			message: "#^Cannot call method searchableAs\\(\\) on mixed\\.$#"
-			count: 2
 			path: src/Engine.php
 
 		-
-			message: "#^Cannot call method searchableWith\\(\\) on Illuminate\\\\Database\\\\Eloquent\\\\Model\\|null\\.$#"
+			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:getScoutKey\\(\\)\\.$#"
 			count: 1
-			path: src/Factories/DocumentFactory.php
+			path: src/Factories/LazyModelFactory.php
 
 		-
-			message: "#^Cannot call method makeFromModels\\(\\) on mixed\\.$#"
+			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:getScoutKey\\(\\)\\.$#"
 			count: 1
 			path: src/Jobs/RemoveFromSearch.php
 
 		-
-			message: "#^Cannot call method searchableAs\\(\\) on mixed\\.$#"
+			message: "#^Call to an undefined method Illuminate\\\\Database\\\\Eloquent\\\\Model\\:\\:searchableAs\\(\\)\\.$#"
 			count: 1
-			path: src/Jobs/RemoveFromSearch.php
+			path: src/Support/ModelScope.php
 
 		-
-			message: "#^Method Elastic\\\\ScoutDriverPlus\\\\QueryParameters\\\\Transformers\\\\CallbackArrayTransformer\\:\\:transform\\(\\) should return array but returns mixed\\.$#"
+			message: "#^Unsafe usage of new static\\(\\)\\.$#"
 			count: 1
-			path: src/QueryParameters/Transformers/CallbackArrayTransformer.php
+			path: tests/App/Model.php
+
+		-
+			message: "#^Call to an undefined static method ElasticScoutDriverPlus\\\\Support\\\\Query\\:\\:tagged\\(\\)\\.$#"
+			count: 1
+			path: tests/Integration/Queries/CustomQueryTest.php
+
+		-
+			message: "#^Cannot call method run\\(\\) on Illuminate\\\\Testing\\\\PendingCommand\\|int\\.$#"
+			count: 4
+			path: tests/Integration/TestCase.php
+

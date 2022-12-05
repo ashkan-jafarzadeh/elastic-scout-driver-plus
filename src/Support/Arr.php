@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\Support;
+namespace ElasticScoutDriverPlus\Support;
 
 use Illuminate\Support\Arr as BaseArr;
 
@@ -12,6 +12,8 @@ final class Arr extends BaseArr
             return $array;
         }
 
-        return array_map(static fn ($value, $key) => [$key => $value], $array, array_keys($array));
+        return array_map(static function ($value, $key) {
+            return [$key => $value];
+        }, $array, array_keys($array));
     }
 }

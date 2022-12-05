@@ -1,22 +1,25 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\Tests\Unit\Builders;
+namespace ElasticScoutDriverPlus\Tests\Unit\Builders;
 
-use Elastic\ScoutDriverPlus\Builders\GeoDistanceQueryBuilder;
-use Elastic\ScoutDriverPlus\Exceptions\QueryBuilderValidationException;
+use ElasticScoutDriverPlus\Builders\GeoDistanceQueryBuilder;
+use ElasticScoutDriverPlus\Exceptions\QueryBuilderException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Elastic\ScoutDriverPlus\Builders\AbstractParameterizedQueryBuilder
- * @covers \Elastic\ScoutDriverPlus\Builders\GeoDistanceQueryBuilder
+ * @covers \ElasticScoutDriverPlus\Builders\AbstractParameterizedQueryBuilder
+ * @covers \ElasticScoutDriverPlus\Builders\GeoDistanceQueryBuilder
  *
- * @uses   \Elastic\ScoutDriverPlus\QueryParameters\ParameterCollection
- * @uses   \Elastic\ScoutDriverPlus\QueryParameters\Transformers\CallbackArrayTransformer
- * @uses   \Elastic\ScoutDriverPlus\QueryParameters\Validators\AllOfValidator
+ * @uses   \ElasticScoutDriverPlus\QueryParameters\ParameterCollection
+ * @uses   \ElasticScoutDriverPlus\QueryParameters\Transformers\CallbackArrayTransformer
+ * @uses   \ElasticScoutDriverPlus\QueryParameters\Validators\AllOfValidator
  */
 final class GeoDistanceQueryBuilderTest extends TestCase
 {
-    private GeoDistanceQueryBuilder $builder;
+    /**
+     * @var GeoDistanceQueryBuilder
+     */
+    private $builder;
 
     protected function setUp(): void
     {
@@ -27,7 +30,7 @@ final class GeoDistanceQueryBuilderTest extends TestCase
 
     public function test_exception_is_thrown_when_required_parameters_are_not_specified(): void
     {
-        $this->expectException(QueryBuilderValidationException::class);
+        $this->expectException(QueryBuilderException::class);
         $this->builder->buildQuery();
     }
 

@@ -1,19 +1,22 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\Tests\Unit\QueryParameters;
+namespace ElasticScoutDriverPlus\Tests\Unit\QueryParameters;
 
-use Elastic\ScoutDriverPlus\QueryParameters\ParameterCollection;
+use ElasticScoutDriverPlus\QueryParameters\ParameterCollection;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
 /**
- * @covers \Elastic\ScoutDriverPlus\QueryParameters\ParameterCollection
+ * @covers \ElasticScoutDriverPlus\QueryParameters\ParameterCollection
  *
- * @uses   \Elastic\ScoutDriverPlus\Support\Arr
+ * @uses   \ElasticScoutDriverPlus\Support\Arr
  */
 final class ParameterCollectionTest extends TestCase
 {
-    private ParameterCollection $collection;
+    /**
+     * @var ParameterCollection
+     */
+    private $collection;
 
     protected function setUp(): void
     {

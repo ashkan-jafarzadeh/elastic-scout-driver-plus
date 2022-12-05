@@ -1,34 +1,34 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\Tests\Integration\Decorators;
+namespace ElasticScoutDriverPlus\Tests\Integration\Decorators;
 
-use Elastic\Adapter\Documents\Document;
-use Elastic\Adapter\Search\Highlight;
-use Elastic\Adapter\Search\SearchResult as BaseSearchResult;
-use Elastic\ScoutDriverPlus\Decorators\Hit;
-use Elastic\ScoutDriverPlus\Decorators\SearchResult;
-use Elastic\ScoutDriverPlus\Factories\ModelFactory;
-use Elastic\ScoutDriverPlus\Tests\App\Book;
-use Elastic\ScoutDriverPlus\Tests\App\Model;
-use Elastic\ScoutDriverPlus\Tests\Integration\TestCase;
-use Illuminate\Database\Eloquent\Collection;
+use ElasticAdapter\Documents\Document;
+use ElasticAdapter\Search\Highlight;
+use ElasticAdapter\Search\SearchResponse;
+use ElasticScoutDriverPlus\Decorators\Hit;
+use ElasticScoutDriverPlus\Decorators\SearchResult;
+use ElasticScoutDriverPlus\Factories\LazyModelFactory;
+use ElasticScoutDriverPlus\Tests\App\Book;
+use ElasticScoutDriverPlus\Tests\App\Model;
+use ElasticScoutDriverPlus\Tests\Integration\TestCase;
 
 /**
- * @covers \Elastic\ScoutDriverPlus\Decorators\SearchResult
+ * @covers \ElasticScoutDriverPlus\Decorators\SearchResult
  *
- * @uses   \Elastic\ScoutDriverPlus\Decorators\Hit
- * @uses   \Elastic\ScoutDriverPlus\Decorators\Suggestion
- * @uses   \Elastic\ScoutDriverPlus\Factories\LazyModelFactory
+ * @uses   \ElasticScoutDriverPlus\Decorators\Hit
  */
 final class SearchResultTest extends TestCase
 {
-    private SearchResult $searchResult;
+    /**
+     * @var SearchResult
+     */
+    private $searchResult;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        $baseSearchResult = new BaseSearchResult([
+        $searchResponse = new SearchResponse([
             'hits' => [
                 'hits' => [
                     [
@@ -40,15 +40,6 @@ final class SearchResultTest extends TestCase
                     ],
                 ],
             ],
-            'suggest' => [
-                'bar' => [
-                    [
-                        'text' => 'foo',
-                        'offset' => 0,
-                        'length' => 3,
-                    ],
-                ],
-            ],
         ]);
 
         $model = new Book([
@@ -56,14 +47,14 @@ final class SearchResultTest extends TestCase
             'title' => 'foo',
         ]);
 
-        $modelFactory = $this->createMock(ModelFactory::class);
+        $lazyModelFactory = $this->createMock(LazyModelFactory::class);
 
-        $modelFactory->expects($this->any())
-            ->method('makeFromIndexNameAndDocumentIds')
-            ->with('test', [(string)$model->getScoutKey()])
-            ->willReturn(new Collection([$model]));
+        $lazyModelFactory->expects($this->any())
+            ->method('makeByIndexNameAndDocumentId')
+            ->with('test', '1')
+            ->willReturn($model);
 
-        $this->searchResult = new SearchResult($baseSearchResult, $modelFactory);
+        $this->searchResult = new SearchResult($searchResponse, $lazyModelFactory);
     }
 
     public function test_hits_can_be_retrieved(): void
@@ -108,14 +99,5 @@ final class SearchResultTest extends TestCase
             $this->assertInstanceOf(Hit::class, $hit);
             $this->assertSame('test', $hit->indexName());
         }
-    }
-
-    public function test_suggestions_can_be_retrieved(): void
-    {
-        $suggestions = $this->searchResult->suggestions();
-
-        $this->assertCount(1, $suggestions);
-        $this->assertCount(1, $suggestions->get('bar'));
-        $this->assertSame('foo', $suggestions->get('bar')->first()->text());
     }
 }

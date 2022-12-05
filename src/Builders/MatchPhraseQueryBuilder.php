@@ -1,15 +1,15 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\Builders;
+namespace ElasticScoutDriverPlus\Builders;
 
-use Elastic\ScoutDriverPlus\QueryParameters\ParameterCollection;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\AnalyzerParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\FieldParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\QueryStringParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\SlopParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\ZeroTermsQueryParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Transformers\GroupedArrayTransformer;
-use Elastic\ScoutDriverPlus\QueryParameters\Validators\AllOfValidator;
+use ElasticScoutDriverPlus\QueryParameters\ParameterCollection;
+use ElasticScoutDriverPlus\QueryParameters\Shared\AnalyzerParameter;
+use ElasticScoutDriverPlus\QueryParameters\Shared\FieldParameter;
+use ElasticScoutDriverPlus\QueryParameters\Shared\QueryStringParameter;
+use ElasticScoutDriverPlus\QueryParameters\Shared\SlopParameter;
+use ElasticScoutDriverPlus\QueryParameters\Shared\ZeroTermsQueryParameter;
+use ElasticScoutDriverPlus\QueryParameters\Transformers\GroupedArrayTransformer;
+use ElasticScoutDriverPlus\QueryParameters\Validators\AllOfValidator;
 
 final class MatchPhraseQueryBuilder extends AbstractParameterizedQueryBuilder
 {
@@ -19,7 +19,10 @@ final class MatchPhraseQueryBuilder extends AbstractParameterizedQueryBuilder
     use AnalyzerParameter;
     use ZeroTermsQueryParameter;
 
-    protected string $type = 'match_phrase';
+    /**
+     * @var string
+     */
+    protected $type = 'match_phrase';
 
     public function __construct()
     {

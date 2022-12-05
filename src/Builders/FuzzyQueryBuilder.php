@@ -1,16 +1,16 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\Builders;
+namespace ElasticScoutDriverPlus\Builders;
 
-use Elastic\ScoutDriverPlus\QueryParameters\ParameterCollection;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\FieldParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\FuzzinessParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\MaxExpansionsParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\PrefixLengthParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\RewriteParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\ValueParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Transformers\GroupedArrayTransformer;
-use Elastic\ScoutDriverPlus\QueryParameters\Validators\AllOfValidator;
+use ElasticScoutDriverPlus\QueryParameters\ParameterCollection;
+use ElasticScoutDriverPlus\QueryParameters\Shared\FieldParameter;
+use ElasticScoutDriverPlus\QueryParameters\Shared\FuzzinessParameter;
+use ElasticScoutDriverPlus\QueryParameters\Shared\MaxExpansionsParameter;
+use ElasticScoutDriverPlus\QueryParameters\Shared\PrefixLengthParameter;
+use ElasticScoutDriverPlus\QueryParameters\Shared\RewriteParameter;
+use ElasticScoutDriverPlus\QueryParameters\Shared\ValueParameter;
+use ElasticScoutDriverPlus\QueryParameters\Transformers\GroupedArrayTransformer;
+use ElasticScoutDriverPlus\QueryParameters\Validators\AllOfValidator;
 
 final class FuzzyQueryBuilder extends AbstractParameterizedQueryBuilder
 {
@@ -21,7 +21,10 @@ final class FuzzyQueryBuilder extends AbstractParameterizedQueryBuilder
     use PrefixLengthParameter;
     use RewriteParameter;
 
-    protected string $type = 'fuzzy';
+    /**
+     * @var string
+     */
+    protected $type = 'fuzzy';
 
     public function __construct()
     {

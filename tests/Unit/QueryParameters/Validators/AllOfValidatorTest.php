@@ -1,22 +1,22 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\Tests\Unit\QueryParameters\Validators;
+namespace ElasticScoutDriverPlus\Tests\Unit\QueryParameters\Validators;
 
-use Elastic\ScoutDriverPlus\Exceptions\QueryBuilderValidationException;
-use Elastic\ScoutDriverPlus\QueryParameters\ParameterCollection;
-use Elastic\ScoutDriverPlus\QueryParameters\Validators\AllOfValidator;
+use ElasticScoutDriverPlus\Exceptions\QueryBuilderException;
+use ElasticScoutDriverPlus\QueryParameters\ParameterCollection;
+use ElasticScoutDriverPlus\QueryParameters\Validators\AllOfValidator;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Elastic\ScoutDriverPlus\QueryParameters\Validators\AllOfValidator
+ * @covers \ElasticScoutDriverPlus\QueryParameters\Validators\AllOfValidator
  *
- * @uses   \Elastic\ScoutDriverPlus\QueryParameters\ParameterCollection
+ * @uses   \ElasticScoutDriverPlus\QueryParameters\ParameterCollection
  */
 final class AllOfValidatorTest extends TestCase
 {
     public function test_exception_is_thrown_when_one_of_required_parameters_is_missing(): void
     {
-        $this->expectException(QueryBuilderValidationException::class);
+        $this->expectException(QueryBuilderException::class);
 
         $parameters = new ParameterCollection(['field' => 'title']);
         $validator = new AllOfValidator(['field', 'query']);

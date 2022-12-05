@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\Tests\App;
+namespace ElasticScoutDriverPlus\Tests\App;
 
 /**
  * @property int    $id
@@ -10,6 +10,9 @@ namespace Elastic\ScoutDriverPlus\Tests\App;
  */
 final class Store extends Model
 {
+    /**
+     * @var string[]
+     */
     protected $hidden = ['lat', 'lon'];
 
     /**

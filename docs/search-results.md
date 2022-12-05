@@ -12,7 +12,7 @@ $raw = Book::searchQuery($query)->raw();
 
 ## SearchResult
 
-You can execute the query and get `Elastic\ScoutDriverPlus\Decorators\SearchResult` instance in return:
+You can execute the query and get `ElasticScoutDriverPlus\Decorators\SearchResult` instance in return:
 
 ```php
 $searchResult = Book::searchQuery($query)->execute();
@@ -77,7 +77,7 @@ You can retrieve a collection of hits:
 $hits = $searchResult->hits();
 ```
 
-Each hit provides access to the related index name, the score, the model, the document, the highlight and more:
+Each hit provides access to the related index name, the score, the model, the document, the highlight and the inner hits:
 
 ```php
 $hit = $hits->first();
@@ -88,7 +88,6 @@ $model = $hit->model();
 $document = $hit->document();
 $highlight = $hit->highlight();
 $innerHits = $hit->innerHits();
-$explanation = $hit->explanation();
 ```
 
 Furthermore, you can get a raw representation of the respective hit:
@@ -125,12 +124,6 @@ $text = $firstSuggestion->text();
 $offset = $firstSuggestion->offset();
 $length = $firstSuggestion->length();
 $options = $firstSuggestion->options();
-```
-
-You can also resolve the related models when [the completion suggester](https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters.html#completion-suggester) is used:
-
-```php
-$models = $firstSuggestion->models();
 ```
 
 ### total

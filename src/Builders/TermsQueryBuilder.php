@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\Builders;
+namespace ElasticScoutDriverPlus\Builders;
 
-use Elastic\ScoutDriverPlus\QueryParameters\ParameterCollection;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\BoostParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\FieldParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\ValuesParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Transformers\CallbackArrayTransformer;
-use Elastic\ScoutDriverPlus\QueryParameters\Validators\AllOfValidator;
+use ElasticScoutDriverPlus\QueryParameters\ParameterCollection;
+use ElasticScoutDriverPlus\QueryParameters\Shared\BoostParameter;
+use ElasticScoutDriverPlus\QueryParameters\Shared\FieldParameter;
+use ElasticScoutDriverPlus\QueryParameters\Shared\ValuesParameter;
+use ElasticScoutDriverPlus\QueryParameters\Transformers\CallbackArrayTransformer;
+use ElasticScoutDriverPlus\QueryParameters\Validators\AllOfValidator;
 
 final class TermsQueryBuilder extends AbstractParameterizedQueryBuilder
 {
@@ -15,7 +15,10 @@ final class TermsQueryBuilder extends AbstractParameterizedQueryBuilder
     use ValuesParameter;
     use BoostParameter;
 
-    protected string $type = 'terms';
+    /**
+     * @var string
+     */
+    protected $type = 'terms';
 
     public function __construct()
     {
@@ -23,11 +26,11 @@ final class TermsQueryBuilder extends AbstractParameterizedQueryBuilder
 
         $this->parameterValidator = new AllOfValidator(['field', 'values']);
 
-        $this->parameterTransformer = new CallbackArrayTransformer(
-            static fn (ParameterCollection $parameters) => array_merge(
+        $this->parameterTransformer = new CallbackArrayTransformer(static function (ParameterCollection $parameters) {
+            return array_merge(
                 [$parameters->get('field') => $parameters->get('values')],
                 $parameters->except(['field', 'values'])->excludeEmpty()->toArray(),
-            )
-        );
+            );
+        });
     }
 }

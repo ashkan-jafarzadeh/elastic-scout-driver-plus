@@ -1,42 +1,111 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\Factories;
+namespace ElasticScoutDriverPlus\Factories;
 
-use Elastic\Adapter\Search\Hit as BaseHit;
-use Elastic\Adapter\Search\SearchResult as BaseSearchResult;
+use ElasticAdapter\Indices\IndexManager;
+use ElasticAdapter\Search\SearchResponse;
+use ElasticScoutDriverPlus\Support\ModelScope;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Collection;
 
 class LazyModelFactory
 {
-    private array $documentIds = [];
-    private ModelFactory $modelFactory;
-    private array $models = [];
+    /**
+     * @var ModelScope
+     */
+    private $modelScope;
+    /**
+     * List of model ids keyed by index name
+     *
+     * @var array
+     */
+    private $mappedIds = [];
+    /**
+     * List of models keyed by index name
+     *
+     * @var array
+     */
+    private $mappedModels = [];
 
-    public function __construct(BaseSearchResult $searchResult, ModelFactory $modelFactory)
+    public function __construct(SearchResponse $searchResponse, ModelScope $modelScope)
     {
-        $searchResult->hits()->each(function (BaseHit $baseHit) {
-            $this->documentIds[$baseHit->indexName()][] = $baseHit->document()->id();
+        $this->modelScope = $modelScope;
 
-            $baseHit->innerHits()->each(function (BaseCollection $baseInnerHits) {
-                $baseInnerHits->each(function (BaseHit $baseInnerHit) {
-                    $this->documentIds[$baseInnerHit->indexName()][] = $baseInnerHit->document()->id();
-                });
-            });
-        });
-
-        $this->modelFactory = $modelFactory;
+        foreach ($searchResponse->hits() as $hit) {
+            $this->mappedIds[$hit->indexName()][] = $hit->document()->id();
+        }
     }
 
-    public function makeFromIndexNameAndDocumentId(string $indexName, string $documentId): ?Model
+    public function makeByIndexNameAndDocumentId(string $indexName, string $documentId): ?Model
     {
-        if (!isset($this->models[$indexName])) {
-            $this->models[$indexName] = $this->modelFactory->makeFromIndexNameAndDocumentIds(
-                $indexName,
-                $this->documentIds[$indexName] ?? []
-            )->keyBy(static fn (Model $model) => (string)$model->getScoutKey());
+        if (!isset($this->mappedModels[$indexName])) {
+            $this->mappedModels[$indexName] = $this->mapModels($indexName);
         }
 
-        return $this->models[$indexName][$documentId] ?? null;
+        return $this->mappedModels[$indexName][$documentId] ?? null;
+    }
+
+    private function mapModels(string $indexName): Collection
+    {
+        $aliasName = $this->resolveAlias($indexName) ?? $indexName;
+        $modelClass = $this->modelScope->resolveModelClass($aliasName);
+
+        if (!isset($this->mappedIds[$indexName], $modelClass)) {
+            return new Collection();
+        }
+
+        $ids = $this->mappedIds[$indexName];
+        $model = new $modelClass();
+        $relations = $this->modelScope->resolveRelations($modelClass);
+        $queryCallback = $this->modelScope->resolveQueryCallback($modelClass);
+
+        $query = in_array(SoftDeletes::class, class_uses_recursive($model), true)
+            ? $model->withTrashed()
+            : $model->newQuery();
+
+        if (isset($relations)) {
+            $query->with($relations);
+        }
+
+        $query->whereIn($model->getScoutKeyName(), $ids);
+
+        if (isset($queryCallback)) {
+            $queryCallback($query);
+        }
+
+        $result = $query->get();
+
+        return $result->mapWithKeys(static function (Model $model) {
+            return [(string)$model->getScoutKey() => $model];
+        });
+    }
+
+    private function resolveAlias(string $indexName): ?string
+    {
+        $indexNames = $this->modelScope->resolveIndexNames();
+
+        // if the index name can be found in the scope, then we can be sure,
+        // that an actual index name is used to map models to the index
+        if ($indexNames->contains($indexName)) {
+            return null;
+        }
+
+        // otherwise, we get all aliases for the given index and
+        // try to find the one, which is in the scope
+        foreach (app(IndexManager::class)->getAliases($indexName) as $alias) {
+            if ($indexNames->contains($alias->name())) {
+                return $alias->name();
+            }
+        }
+
+        return null;
+    }
+
+
+
+    public function getMappedIds()
+    {
+        return $this->mappedIds;
     }
 }

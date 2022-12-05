@@ -1,24 +1,27 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\Tests\Unit\Builders;
+namespace ElasticScoutDriverPlus\Tests\Unit\Builders;
 
-use Elastic\ScoutDriverPlus\Builders\RangeQueryBuilder;
-use Elastic\ScoutDriverPlus\Exceptions\QueryBuilderValidationException;
+use ElasticScoutDriverPlus\Builders\RangeQueryBuilder;
+use ElasticScoutDriverPlus\Exceptions\QueryBuilderException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Elastic\ScoutDriverPlus\Builders\AbstractParameterizedQueryBuilder
- * @covers \Elastic\ScoutDriverPlus\Builders\RangeQueryBuilder
+ * @covers \ElasticScoutDriverPlus\Builders\AbstractParameterizedQueryBuilder
+ * @covers \ElasticScoutDriverPlus\Builders\RangeQueryBuilder
  *
- * @uses   \Elastic\ScoutDriverPlus\QueryParameters\ParameterCollection
- * @uses   \Elastic\ScoutDriverPlus\QueryParameters\Transformers\GroupedArrayTransformer
- * @uses   \Elastic\ScoutDriverPlus\QueryParameters\Validators\AllOfValidator
- * @uses   \Elastic\ScoutDriverPlus\QueryParameters\Validators\CompoundValidator
- * @uses   \Elastic\ScoutDriverPlus\QueryParameters\Validators\OneOfValidator
+ * @uses   \ElasticScoutDriverPlus\QueryParameters\ParameterCollection
+ * @uses   \ElasticScoutDriverPlus\QueryParameters\Transformers\GroupedArrayTransformer
+ * @uses   \ElasticScoutDriverPlus\QueryParameters\Validators\AllOfValidator
+ * @uses   \ElasticScoutDriverPlus\QueryParameters\Validators\CompoundValidator
+ * @uses   \ElasticScoutDriverPlus\QueryParameters\Validators\OneOfValidator
  */
 final class RangeQueryBuilderTest extends TestCase
 {
-    private RangeQueryBuilder $builder;
+    /**
+     * @var RangeQueryBuilder
+     */
+    private $builder;
 
     protected function setUp(): void
     {
@@ -29,7 +32,7 @@ final class RangeQueryBuilderTest extends TestCase
 
     public function test_exception_is_thrown_when_field_is_not_specified(): void
     {
-        $this->expectException(QueryBuilderValidationException::class);
+        $this->expectException(QueryBuilderException::class);
 
         $this->builder
             ->gt(10)
@@ -38,7 +41,7 @@ final class RangeQueryBuilderTest extends TestCase
 
     public function test_exception_is_thrown_when_range_is_not_specified(): void
     {
-        $this->expectException(QueryBuilderValidationException::class);
+        $this->expectException(QueryBuilderException::class);
 
         $this->builder
             ->field('age')

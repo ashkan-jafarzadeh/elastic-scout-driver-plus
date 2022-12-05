@@ -1,9 +1,12 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\QueryParameters\Shared;
+namespace ElasticScoutDriverPlus\QueryParameters\Shared;
 
 trait FieldsParameter
 {
+    /**
+     * @param string[] $fields
+     */
     public function fields(array $fields): self
     {
         $this->parameters->put('fields', $fields);

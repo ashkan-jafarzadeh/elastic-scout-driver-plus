@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\Factories;
+namespace ElasticScoutDriverPlus\Factories;
 
 use Closure;
-use Elastic\ScoutDriverPlus\Builders\QueryBuilderInterface;
+use ElasticScoutDriverPlus\Builders\QueryBuilderInterface;
 
 class ParameterFactory
 {
@@ -12,7 +12,6 @@ class ParameterFactory
      */
     public static function makeQuery($query): array
     {
-        /** @var QueryBuilderInterface|array $query */
         $query = value($query);
 
         return $query instanceof QueryBuilderInterface ? $query->buildQuery() : $query;

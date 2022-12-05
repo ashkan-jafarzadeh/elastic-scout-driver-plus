@@ -6,7 +6,10 @@ use Illuminate\Support\Facades\Schema;
 
 class CreateStoresTable extends Migration
 {
-    public function up(): void
+    /**
+     * @return void
+     */
+    public function up()
     {
         Schema::create('stores', static function (Blueprint $table) {
             $table->bigIncrements('id');
@@ -16,7 +19,10 @@ class CreateStoresTable extends Migration
         });
     }
 
-    public function down(): void
+    /**
+     * @return void
+     */
+    public function down()
     {
         Schema::dropIfExists('stores');
     }

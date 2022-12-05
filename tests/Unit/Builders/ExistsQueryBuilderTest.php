@@ -1,22 +1,25 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\Tests\Unit\Builders;
+namespace ElasticScoutDriverPlus\Tests\Unit\Builders;
 
-use Elastic\ScoutDriverPlus\Builders\ExistsQueryBuilder;
-use Elastic\ScoutDriverPlus\Exceptions\QueryBuilderValidationException;
+use ElasticScoutDriverPlus\Builders\ExistsQueryBuilder;
+use ElasticScoutDriverPlus\Exceptions\QueryBuilderException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Elastic\ScoutDriverPlus\Builders\AbstractParameterizedQueryBuilder
- * @covers \Elastic\ScoutDriverPlus\Builders\ExistsQueryBuilder
+ * @covers \ElasticScoutDriverPlus\Builders\AbstractParameterizedQueryBuilder
+ * @covers \ElasticScoutDriverPlus\Builders\ExistsQueryBuilder
  *
- * @uses   \Elastic\ScoutDriverPlus\QueryParameters\ParameterCollection
- * @uses   \Elastic\ScoutDriverPlus\QueryParameters\Transformers\FlatArrayTransformer
- * @uses   \Elastic\ScoutDriverPlus\QueryParameters\Validators\AllOfValidator
+ * @uses   \ElasticScoutDriverPlus\QueryParameters\ParameterCollection
+ * @uses   \ElasticScoutDriverPlus\QueryParameters\Transformers\FlatArrayTransformer
+ * @uses   \ElasticScoutDriverPlus\QueryParameters\Validators\AllOfValidator
  */
 final class ExistsQueryBuilderTest extends TestCase
 {
-    private ExistsQueryBuilder $builder;
+    /**
+     * @var ExistsQueryBuilder
+     */
+    private $builder;
 
     protected function setUp(): void
     {
@@ -27,7 +30,7 @@ final class ExistsQueryBuilderTest extends TestCase
 
     public function test_exception_is_thrown_when_field_is_not_specified(): void
     {
-        $this->expectException(QueryBuilderValidationException::class);
+        $this->expectException(QueryBuilderException::class);
 
         $this->builder
             ->buildQuery();

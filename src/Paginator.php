@@ -1,8 +1,8 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus;
+namespace ElasticScoutDriverPlus;
 
-use Elastic\ScoutDriverPlus\Decorators\SearchResult;
+use ElasticScoutDriverPlus\Decorators\SearchResult;
 use Illuminate\Pagination\LengthAwarePaginator;
 use RuntimeException;
 
@@ -11,7 +11,10 @@ use RuntimeException;
  */
 final class Paginator extends LengthAwarePaginator
 {
-    private SearchResult $searchResult;
+    /**
+     * @var SearchResult
+     */
+    private $searchResult;
 
     public function __construct(
         SearchResult $searchResult,
@@ -50,7 +53,7 @@ final class Paginator extends LengthAwarePaginator
     }
 
     /**
-     * {@inheritDoc}
+     * @{@inheritDoc}
      */
     public function __call($method, $parameters)
     {

@@ -1,12 +1,15 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\QueryParameters\Validators;
+namespace ElasticScoutDriverPlus\QueryParameters\Validators;
 
-use Elastic\ScoutDriverPlus\QueryParameters\ParameterCollection;
+use ElasticScoutDriverPlus\QueryParameters\ParameterCollection;
 
 final class CompoundValidator implements ValidatorInterface
 {
-    private array $validators;
+    /**
+     * @var ValidatorInterface[]
+     */
+    private $validators;
 
     public function __construct(ValidatorInterface ...$validators)
     {

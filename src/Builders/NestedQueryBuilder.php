@@ -1,13 +1,13 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\Builders;
+namespace ElasticScoutDriverPlus\Builders;
 
-use Elastic\ScoutDriverPlus\QueryParameters\ParameterCollection;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\IgnoreUnmappedParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\QueryParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Shared\ScoreModeParameter;
-use Elastic\ScoutDriverPlus\QueryParameters\Transformers\FlatArrayTransformer;
-use Elastic\ScoutDriverPlus\QueryParameters\Validators\AllOfValidator;
+use ElasticScoutDriverPlus\QueryParameters\ParameterCollection;
+use ElasticScoutDriverPlus\QueryParameters\Shared\IgnoreUnmappedParameter;
+use ElasticScoutDriverPlus\QueryParameters\Shared\QueryParameter;
+use ElasticScoutDriverPlus\QueryParameters\Shared\ScoreModeParameter;
+use ElasticScoutDriverPlus\QueryParameters\Transformers\FlatArrayTransformer;
+use ElasticScoutDriverPlus\QueryParameters\Validators\AllOfValidator;
 use stdClass;
 
 final class NestedQueryBuilder extends AbstractParameterizedQueryBuilder
@@ -16,7 +16,10 @@ final class NestedQueryBuilder extends AbstractParameterizedQueryBuilder
     use ScoreModeParameter;
     use IgnoreUnmappedParameter;
 
-    protected string $type = 'nested';
+    /**
+     * @var string
+     */
+    protected $type = 'nested';
 
     public function __construct()
     {

@@ -1,22 +1,25 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\Tests\Unit\Builders;
+namespace ElasticScoutDriverPlus\Tests\Unit\Builders;
 
-use Elastic\ScoutDriverPlus\Builders\FuzzyQueryBuilder;
-use Elastic\ScoutDriverPlus\Exceptions\QueryBuilderValidationException;
+use ElasticScoutDriverPlus\Builders\FuzzyQueryBuilder;
+use ElasticScoutDriverPlus\Exceptions\QueryBuilderException;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Elastic\ScoutDriverPlus\Builders\AbstractParameterizedQueryBuilder
- * @covers \Elastic\ScoutDriverPlus\Builders\FuzzyQueryBuilder
+ * @covers \ElasticScoutDriverPlus\Builders\AbstractParameterizedQueryBuilder
+ * @covers \ElasticScoutDriverPlus\Builders\FuzzyQueryBuilder
  *
- * @uses   \Elastic\ScoutDriverPlus\QueryParameters\ParameterCollection
- * @uses   \Elastic\ScoutDriverPlus\QueryParameters\Transformers\GroupedArrayTransformer
- * @uses   \Elastic\ScoutDriverPlus\QueryParameters\Validators\AllOfValidator
+ * @uses   \ElasticScoutDriverPlus\QueryParameters\ParameterCollection
+ * @uses   \ElasticScoutDriverPlus\QueryParameters\Transformers\GroupedArrayTransformer
+ * @uses   \ElasticScoutDriverPlus\QueryParameters\Validators\AllOfValidator
  */
 final class FuzzyQueryBuilderTest extends TestCase
 {
-    private FuzzyQueryBuilder $builder;
+    /**
+     * @var FuzzyQueryBuilder
+     */
+    private $builder;
 
     protected function setUp(): void
     {
@@ -27,7 +30,7 @@ final class FuzzyQueryBuilderTest extends TestCase
 
     public function test_exception_is_thrown_when_field_is_not_specified(): void
     {
-        $this->expectException(QueryBuilderValidationException::class);
+        $this->expectException(QueryBuilderException::class);
 
         $this->builder
             ->value('lack')
@@ -36,7 +39,7 @@ final class FuzzyQueryBuilderTest extends TestCase
 
     public function test_exception_is_thrown_when_value_is_not_specified(): void
     {
-        $this->expectException(QueryBuilderValidationException::class);
+        $this->expectException(QueryBuilderException::class);
 
         $this->builder
             ->field('title')

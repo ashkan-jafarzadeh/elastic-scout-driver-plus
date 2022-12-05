@@ -1,15 +1,15 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\Tests\Unit\QueryParameters\Transformers;
+namespace ElasticScoutDriverPlus\Tests\Unit\QueryParameters\Transformers;
 
-use Elastic\ScoutDriverPlus\QueryParameters\ParameterCollection;
-use Elastic\ScoutDriverPlus\QueryParameters\Transformers\CallbackArrayTransformer;
+use ElasticScoutDriverPlus\QueryParameters\ParameterCollection;
+use ElasticScoutDriverPlus\QueryParameters\Transformers\CallbackArrayTransformer;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \Elastic\ScoutDriverPlus\QueryParameters\Transformers\CallbackArrayTransformer
+ * @covers \ElasticScoutDriverPlus\QueryParameters\Transformers\CallbackArrayTransformer
  *
- * @uses   \Elastic\ScoutDriverPlus\QueryParameters\ParameterCollection
+ * @uses   \ElasticScoutDriverPlus\QueryParameters\ParameterCollection
  */
 final class CallbackArrayTransformerTest extends TestCase
 {
@@ -22,13 +22,15 @@ final class CallbackArrayTransformerTest extends TestCase
             'lon' => 70,
         ]);
 
-        $transformer = new CallbackArrayTransformer(static fn (ParameterCollection $parameters) => [
-            'distance' => $parameters->get('distance'),
-            $parameters->get('field') => [
-                'lat' => $parameters->get('lat'),
-                'lon' => $parameters->get('lon'),
-            ],
-        ]);
+        $transformer = new CallbackArrayTransformer(static function (ParameterCollection $parameters) {
+            return [
+                'distance' => $parameters->get('distance'),
+                $parameters->get('field') => [
+                    'lat' => $parameters->get('lat'),
+                    'lon' => $parameters->get('lon'),
+                ],
+            ];
+        });
 
         $this->assertSame(
             [

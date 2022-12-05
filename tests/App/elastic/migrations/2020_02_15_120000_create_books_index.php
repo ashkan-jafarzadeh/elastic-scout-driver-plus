@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-use Elastic\Adapter\Indices\Mapping;
-use Elastic\Adapter\Indices\Settings;
-use Elastic\Migrations\Facades\Index;
-use Elastic\Migrations\MigrationInterface;
+use ElasticAdapter\Indices\Mapping;
+use ElasticAdapter\Indices\Settings;
+use ElasticMigrations\Facades\Index;
+use ElasticMigrations\MigrationInterface;
 
 final class CreateBooksIndex implements MigrationInterface
 {
@@ -13,7 +13,6 @@ final class CreateBooksIndex implements MigrationInterface
             $mapping->integer('id');
             $mapping->integer('author_id');
             $mapping->text('title');
-            $mapping->completion('suggest');
             $mapping->text('description');
             $mapping->integer('price');
             $mapping->date('published', ['format' => 'yyyy-MM-dd']);

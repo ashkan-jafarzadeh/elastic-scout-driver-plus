@@ -1,12 +1,15 @@
 <?php declare(strict_types=1);
 
-namespace Elastic\ScoutDriverPlus\QueryParameters\Transformers;
+namespace ElasticScoutDriverPlus\QueryParameters\Transformers;
 
-use Elastic\ScoutDriverPlus\QueryParameters\ParameterCollection;
+use ElasticScoutDriverPlus\QueryParameters\ParameterCollection;
 
 final class GroupedArrayTransformer implements ArrayTransformerInterface
 {
-    private string $groupKey;
+    /**
+     * @var string
+     */
+    private $groupKey;
 
     public function __construct(string $groupKey)
     {
